@@ -38,7 +38,7 @@ func TestDataSourceAgentPool_Read_TestEmptyAgentPoolList(t *testing.T) {
 	resourceData := schema.TestResourceDataRaw(t, dataAgentPools().Schema, nil)
 	err := dataSourceAgentPoolsRead(resourceData, clients)
 	require.Nil(t, err)
-	agentPoolSet := resourceData.Get("agentpools").(*schema.Set)
+	agentPoolSet := resourceData.Get("agent_pools").(*schema.Set)
 	require.NotNil(t, agentPoolSet)
 	require.Equal(t, 0, agentPoolSet.Len())
 }

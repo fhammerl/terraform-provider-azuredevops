@@ -19,7 +19,7 @@ func dataAgentPools() *schema.Resource {
 		Read: dataSourceAgentPoolsRead,
 
 		Schema: map[string]*schema.Schema{
-			"agentpools": {
+			"agent_pools": {
 				Type:     schema.TypeSet,
 				Computed: true,
 				Set:      getAgentPoolHash,
@@ -75,7 +75,7 @@ func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Unable to compute hash for agent pool names: %v", err)
 	}
 	d.SetId("agentPools#" + base64.URLEncoding.EncodeToString(h.Sum(nil)))
-	err = d.Set("agentpools", results)
+	err = d.Set("agent_pools", results)
 	if err != nil {
 		return err
 	}
