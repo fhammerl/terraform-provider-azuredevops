@@ -75,7 +75,7 @@ func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Unable to compute hash for agent pool names: %v", err)
 	}
 	d.SetId("agentPools#" + base64.URLEncoding.EncodeToString(h.Sum(nil)))
-	err = d.Set("agentPools", results)
+	err = d.Set("agentpools", results)
 	if err != nil {
 		return err
 	}
