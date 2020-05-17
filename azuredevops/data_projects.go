@@ -94,7 +94,6 @@ func dataSourceProjectsRead(d *schema.ResourceData, m interface{}) error {
 		return fmt.Errorf("Error flattening projects. Error: %v", err)
 	}
 
-	h := sha1.New()
 	projectNames, err := datahelper.GetAttributeValues(results, "name")
 	if err != nil {
 		return fmt.Errorf("Failed to get list of project names: %v", err)
@@ -102,6 +101,7 @@ func dataSourceProjectsRead(d *schema.ResourceData, m interface{}) error {
 	if len(projectNames) <= 0 && name != "" {
 		projectNames = append(projectNames, name)
 	}
+	h := sha1.New()
 	if _, err := h.Write([]byte(state + strings.Join(projectNames, "-"))); err != nil {
 		return fmt.Errorf("Unable to compute hash for project names: %v", err)
 	}
