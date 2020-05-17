@@ -14,7 +14,7 @@ import (
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/datahelper"
 )
 
-func dataAgentPools() *schema.Resource {
+func dataAzureAgentPools() *schema.Resource {
 	return &schema.Resource{
 		Read: dataSourceAgentPoolsRead,
 

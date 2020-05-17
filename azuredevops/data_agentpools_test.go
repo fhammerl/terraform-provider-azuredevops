@@ -18,7 +18,7 @@ import (
 )
 
 func TestDataSourceAgentPool_Read_TestEmptyAgentPoolList(t *testing.T) {
-	var emptyAgentPoolList = []taskagent.TaskAgentPool{}
+	agentPoolListEmpty := []taskagent.TaskAgentPool{}
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -32,10 +32,10 @@ func TestDataSourceAgentPool_Read_TestEmptyAgentPoolList(t *testing.T) {
 	taskAgentClient.
 		EXPECT().
 		GetAgentPools(clients.Ctx, taskagent.GetAgentPoolsArgs{}).
-		Return(&emptyAgentPoolList, nil).
+		Return(&agentPoolListEmpty, nil).
 		Times(1)
 
-	resourceData := schema.TestResourceDataRaw(t, dataAgentPools().Schema, nil)
+	resourceData := schema.TestResourceDataRaw(t, dataAzureAgentPools().Schema, nil)
 	err := dataSourceAgentPoolsRead(resourceData, clients)
 	require.Nil(t, err)
 	agentPoolSet := resourceData.Get("agent_pools").(*schema.Set)
