@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -30,7 +31,7 @@ func dataAzureAgentPools() *schema.Resource {
 							Computed: true,
 						},
 						"id": {
-							Type:     schema.TypeString,
+							Type:     schema.TypeInt,
 							Computed: true,
 						},
 						"pool_type": {
@@ -49,7 +50,7 @@ func dataAzureAgentPools() *schema.Resource {
 }
 
 func getAgentPoolHash(v interface{}) int {
-	return hashcode.String(v.(map[string]interface{})["id"].(string))
+	return hashcode.String(strconv.Itoa(v.(map[string]interface{})["id"].(int)))
 }
 
 func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
@@ -92,19 +93,19 @@ func flattenAgentPoolReferences(input *[]taskagent.TaskAgentPool) ([]interface{}
 	for _, element := range *input {
 		output := make(map[string]interface{})
 		if element.Name != nil {
-			output["name"] = element.Name
+			output["name"] = *element.Name
 		}
 
 		if element.Id != nil {
-			output["id"] = element.Id
+			output["id"] = *element.Id
 		}
 
 		if element.PoolType != nil {
-			output["pool_type"] = element.PoolType
+			output["pool_type"] = string(*element.PoolType)
 		}
 
 		if element.AutoProvision != nil {
-			output["auto_provision"] = element.AutoProvision
+			output["auto_provision"] = *element.AutoProvision
 		}
 
 		results = append(results, output)
