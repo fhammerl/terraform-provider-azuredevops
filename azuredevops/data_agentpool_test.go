@@ -19,12 +19,11 @@ import (
  */
 
 // Verifies that the following sequence of events occurrs without error:
-//	(1) TF can create a project
-//	(2) A data source is added to the configuration, and that data source can find the created project
+//	(1) That tf can create a agent pool and that data source can find the created agent pool
 func TestAccAgentPool_DataSource(t *testing.T) {
 	agentPoolName := testhelper.TestAccResourcePrefix + acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	createAgentPool := testhelper.TestAccAgentPoolResource(agentPoolName)
-	getAgentPoolData := fmt.Sprintf("%s\n%s", createAgentPool, testhelper.TestAccAgentPoolDataSource())
+	createAndGetAgentPoolData := fmt.Sprintf("%s\n%s", createAgentPool, testhelper.TestAccAgentPoolDataSource())
 
 	tfNode := "data.azuredevops_agent_pool.pool"
 	resource.Test(t, resource.TestCase{
@@ -32,7 +31,7 @@ func TestAccAgentPool_DataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: getAgentPoolData,
+				Config: createAndGetAgentPoolData,
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttrSet(tfNode, "id"),
 					resource.TestCheckResourceAttrSet(tfNode, "pool_id"),

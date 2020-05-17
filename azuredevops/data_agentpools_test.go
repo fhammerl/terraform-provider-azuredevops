@@ -7,14 +7,18 @@ package azuredevops
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/taskagent"
 	"github.com/microsoft/terraform-provider-azuredevops/azdosdkmocks"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/config"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/converter"
+	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/testhelper"
 	"github.com/stretchr/testify/require"
 )
 
@@ -86,4 +90,39 @@ func TestDataSourceAgentPool_Read_TestFindAllAgentPools(t *testing.T) {
 	agentPoolSet := resourceData.Get("agent_pools").(*schema.Set)
 	require.NotNil(t, agentPoolSet)
 	require.Equal(t, len(dataTestAgentPools), agentPoolSet.Len())
+}
+
+/**
+ * Begin acceptance tests
+ */
+
+// Verifies that the following sequence of events occurrs without error:
+//	(1) TF can create a project
+//	(2) A data source is added to the configuration, and that data source can find the created project
+
+func TestAccAgentPools_DataSource(t *testing.T) {
+	agentPoolName := testhelper.TestAccResourcePrefix + acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
+	agentPool1Name := agentPoolName + "_1"
+
+	createAgent1 := testhelper.TestAccAgentPoolResourceAppendPoolNameToResourceName(agentPool1Name)
+	createAgent2 := testhelper.TestAccAgentPoolResourceAppendPoolNameToResourceName(agentPoolName + "_2")
+	agentPoolsData := testhelper.TestAccAgentPoolsDataSource()
+	createAndGetAgentPools := fmt.Sprintf("%s\n%s\n%s", createAgent1, createAgent2, agentPoolsData)
+
+	tfNode := "data.azuredevops_agent_pools.pools"
+
+	resource.Test(t, resource.TestCase{
+		PreCheck:  func() { testhelper.TestAccPreCheck(t, nil) },
+		Providers: testAccProviders,
+		Steps: []resource.TestStep{
+			{
+				Config: createAndGetAgentPools,
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttrSet(tfNode, "agent_pools.0.name"),
+					resource.TestCheckResourceAttr(tfNode, "agent_pools.0.name", agentPool1Name),
+					resource.TestCheckResourceAttrSet(tfNode, "agent_pools"),
+				),
+			},
+		},
+	})
 }
