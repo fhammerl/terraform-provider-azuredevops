@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/core"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/config"
+	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/datahelper"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/suppress"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/validate"
 )
@@ -94,7 +95,7 @@ func dataSourceProjectsRead(d *schema.ResourceData, m interface{}) error {
 	}
 
 	h := sha1.New()
-	projectNames, err := getAttributeValues(results, "name")
+	projectNames, err := datahelper.GetAttributeValues(results, "name")
 	if err != nil {
 		return fmt.Errorf("Failed to get list of project names: %v", err)
 	}
@@ -110,14 +111,6 @@ func dataSourceProjectsRead(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 	return nil
-}
-
-func getAttributeValues(items []interface{}, attributeName string) ([]string, error) {
-	var result []string
-	for _, element := range items {
-		result = append(result, element.(map[string]interface{})[attributeName].(string))
-	}
-	return result, nil
 }
 
 func flattenProjectReferences(input *[]core.TeamProjectReference) ([]interface{}, error) {
