@@ -285,11 +285,28 @@ resource "azuredevops_agent_pool" "pool" {
 	}`, poolName)
 }
 
-// TestAccProjectDataSource HCL describing a data source for an AzDO project
+// TestAccAgentPoolResource HCL describing an AzDO Agent Pool with agent pool name appended to resource name
+func TestAccAgentPoolResourceAppendPoolNameToResourceName(poolName string) string {
+	return fmt.Sprintf(`
+resource "azuredevops_agent_pool" "pool_%[1]s" {
+	name           = "%[1]s"
+	auto_provision = false
+	pool_type      = "automation"
+	}`, poolName)
+}
+
+// TestAccProjectDataSource HCL describing a data source for an AzDO Agent Pool
 func TestAccAgentPoolDataSource() string {
 	return `
 data "azuredevops_agent_pool" "pool" {
 	pool_id = azuredevops_agent_pool.pool.id
+}`
+}
+
+// TestAccProjectDataSource HCL describing a data source for an AzDO Agent Pools
+func TestAccAgentPoolsDataSource() string {
+	return `
+data "azuredevops_agent_pools" "pools" {	
 }`
 }
 
