@@ -285,6 +285,14 @@ resource "azuredevops_agent_pool" "pool" {
 	}`, poolName)
 }
 
+// TestAccProjectDataSource HCL describing a data source for an AzDO project
+func TestAccAgentPoolDataSource() string {
+	return `
+data "azuredevops_agent_pool" "pool" {
+	pool_id = azuredevops_agent_pool.pool.id
+}`
+}
+
 // TestAccBuildDefinitionResourceGitHub HCL describing an AzDO build definition sourced from GitHub
 func TestAccBuildDefinitionResourceGitHub(projectName string, buildDefinitionName string, buildPath string) string {
 	return TestAccBuildDefinitionResource(
