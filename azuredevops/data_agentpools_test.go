@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/taskagent"
 	"github.com/microsoft/terraform-provider-azuredevops/azdosdkmocks"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/config"
@@ -103,11 +104,12 @@ func TestDataSourceAgentPool_Read_TestFindAllAgentPools(t *testing.T) {
 func TestAccAgentPools_DataSource(t *testing.T) {
 	agentPoolName := testhelper.TestAccResourcePrefix + acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
 	agentPool1Name := agentPoolName + "_1"
+	agentPool2Name := agentPoolName + "_2"
 
 	createAgent1 := testhelper.TestAccAgentPoolResourceAppendPoolNameToResourceName(agentPool1Name)
-	createAgent2 := testhelper.TestAccAgentPoolResourceAppendPoolNameToResourceName(agentPoolName + "_2")
+	createAgent2 := testhelper.TestAccAgentPoolResourceAppendPoolNameToResourceName(agentPool2Name)
 	agentPoolsData := testhelper.TestAccAgentPoolsDataSource()
-	createAndGetAgentPools := fmt.Sprintf("%s\n%s\n%s", createAgent1, createAgent2, agentPoolsData)
+	createAgentPools := fmt.Sprintf("%s\n%s", createAgent1, createAgent2)
 
 	tfNode := "data.azuredevops_agent_pools.pools"
 
@@ -116,13 +118,43 @@ func TestAccAgentPools_DataSource(t *testing.T) {
 		Providers: testAccProviders,
 		Steps: []resource.TestStep{
 			{
-				Config: createAndGetAgentPools,
+				Config: createAgentPools,
+			},
+			{
+				Config: agentPoolsData,
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet(tfNode, "agent_pools.0.name"),
-					resource.TestCheckResourceAttr(tfNode, "agent_pools.0.name", agentPool1Name),
-					resource.TestCheckResourceAttrSet(tfNode, "agent_pools"),
+					testAgentPoolExists(tfNode, agentPool1Name),
+					testAgentPoolExists(tfNode, agentPool2Name),
 				),
 			},
 		},
 	})
+}
+
+func testAgentPoolExists(tfNode string, poolName string) resource.TestCheckFunc {
+	return func(s *terraform.State) error {
+		rootModule := s.RootModule()
+		resource, ok := rootModule.Resources[tfNode]
+		if !ok {
+			return fmt.Errorf("Did not find a project in the TF state")
+		}
+
+		is := resource.Primary
+		if is == nil {
+			return fmt.Errorf("No primary instance: %s in %s", tfNode, rootModule.Path)
+		}
+		if !containsValue(is.Attributes, poolName) {
+			return fmt.Errorf("%s does not contain a pool with name %s", tfNode, poolName)
+		}
+		return nil
+	}
+}
+
+func containsValue(m map[string]string, v string) bool {
+	for _, x := range m {
+		if x == v {
+			return true
+		}
+	}
+	return false
 }
