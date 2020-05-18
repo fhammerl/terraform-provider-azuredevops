@@ -5,11 +5,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform/helper/hashcode"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/taskagent"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/config"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/datahelper"
@@ -21,9 +19,8 @@ func dataAzureAgentPools() *schema.Resource {
 
 		Schema: map[string]*schema.Schema{
 			"agent_pools": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Computed: true,
-				Set:      getAgentPoolHash,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
 						"name": {
@@ -47,10 +44,6 @@ func dataAzureAgentPools() *schema.Resource {
 			},
 		},
 	}
-}
-
-func getAgentPoolHash(v interface{}) int {
-	return hashcode.String(strconv.Itoa(v.(map[string]interface{})["id"].(int)))
 }
 
 func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
