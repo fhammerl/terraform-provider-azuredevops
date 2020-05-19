@@ -44,9 +44,9 @@ func TestDataSourceAgentPool_Read_TestEmptyAgentPoolList(t *testing.T) {
 	resourceData := schema.TestResourceDataRaw(t, dataAzureAgentPools().Schema, nil)
 	err := dataSourceAgentPoolsRead(resourceData, clients)
 	require.Nil(t, err)
-	agentPoolSet := resourceData.Get("agent_pools").(*schema.Set)
-	require.NotNil(t, agentPoolSet)
-	require.Equal(t, 0, agentPoolSet.Len())
+	agentPools := resourceData.Get("agent_pools").([]interface{})
+	require.NotNil(t, agentPools)
+	require.Equal(t, 0, len(agentPools))
 }
 
 var dataTestAgentPools = []taskagent.TaskAgentPool{
@@ -88,9 +88,9 @@ func TestDataSourceAgentPool_Read_TestFindAllAgentPools(t *testing.T) {
 	resourceData := schema.TestResourceDataRaw(t, dataAzureAgentPools().Schema, nil)
 	err := dataSourceAgentPoolsRead(resourceData, clients)
 	require.Nil(t, err)
-	agentPoolSet := resourceData.Get("agent_pools").(*schema.Set)
-	require.NotNil(t, agentPoolSet)
-	require.Equal(t, len(dataTestAgentPools), agentPoolSet.Len())
+	agentPools := resourceData.Get("agent_pools").([]interface{})
+	require.NotNil(t, agentPools)
+	require.Equal(t, len(dataTestAgentPools), len(agentPools))
 }
 
 /**
