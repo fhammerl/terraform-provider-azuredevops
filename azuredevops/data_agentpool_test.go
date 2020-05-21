@@ -1,4 +1,4 @@
-// +build all core resource_project
+// +build all core data_projects
 
 package azuredevops
 
@@ -6,44 +6,39 @@ package azuredevops
 // the Azure DevOps client operations.
 
 import (
-	"fmt"
+	"context"
 	"testing"
 
-	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
-	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/testhelper"
+	"github.com/golang/mock/gomock"
+	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
+	"github.com/microsoft/azure-devops-go-api/azuredevops/taskagent"
+	"github.com/microsoft/terraform-provider-azuredevops/azdosdkmocks"
+	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/config"
+	"github.com/stretchr/testify/require"
 )
 
-/**
- * Begin acceptance tests
- */
+func TestDataSourceAgentPool_Read_TestAgentPoolNotFound(t *testing.T) {
+	agentPoolListEmpty := []taskagent.TaskAgentPool{}
+	name := "nonexistentAgentPool"
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 
-// Verifies that the following sequence of events occurrs without error:
-//	(1) That tf can create a agent pool and that data source can find the created agent pool
-func TestAccAgentPool_DataSource(t *testing.T) {
-	agentPoolName := testhelper.TestAccResourcePrefix + acctest.RandStringFromCharSet(10, acctest.CharSetAlphaNum)
-	createAgentPool := testhelper.TestAccAgentPoolResource(agentPoolName)
-	createAndGetAgentPoolData := fmt.Sprintf("%s\n%s", createAgentPool, testhelper.TestAccAgentPoolDataSource())
+	taskAgentClient := azdosdkmocks.NewMockTaskagentClient(ctrl)
+	clients := &config.AggregatedClient{
+		TaskAgentClient: taskAgentClient,
+		Ctx:             context.Background(),
+	}
 
-	tfNode := "data.azuredevops_agent_pool.pool"
-	resource.Test(t, resource.TestCase{
-		PreCheck:  func() { testhelper.TestAccPreCheck(t, nil) },
-		Providers: testAccProviders,
-		Steps: []resource.TestStep{
-			{
-				Config: createAndGetAgentPoolData,
-				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttrSet(tfNode, "id"),
-					resource.TestCheckResourceAttrSet(tfNode, "pool_id"),
-					resource.TestCheckResourceAttr(tfNode, "name", agentPoolName),
-					resource.TestCheckResourceAttr(tfNode, "auto_provision", "false"),
-					resource.TestCheckResourceAttr(tfNode, "pool_type", "automation"),
-				),
-			},
-		},
-	})
-}
+	taskAgentClient.
+		EXPECT().
+		GetAgentPools(clients.Ctx, taskagent.GetAgentPoolsArgs{
+			PoolName: &name,
+		}).
+		Return(&agentPoolListEmpty, nil).
+		Times(1)
 
-func init() {
-	InitProvider()
+	resourceData := schema.TestResourceDataRaw(t, dataAzureAgentPool().Schema, nil)
+	resourceData.Set("name", &name)
+	err := dataSourceAgentPoolRead(resourceData, clients)
+	require.Contains(t, err.Error(), "Unable to find agent pool")
 }
