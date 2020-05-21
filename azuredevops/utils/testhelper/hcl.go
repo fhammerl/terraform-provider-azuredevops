@@ -299,7 +299,7 @@ resource "azuredevops_agent_pool" "pool_%[1]s" {
 func TestAccAgentPoolDataSource() string {
 	return `
 data "azuredevops_agent_pool" "pool" {
-	pool_id = azuredevops_agent_pool.pool.id
+	name = azuredevops_agent_pool.pool.name
 }`
 }
 
