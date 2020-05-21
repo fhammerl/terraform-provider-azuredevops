@@ -50,6 +50,14 @@ resource "azuredevops_build_definition" "build_definition" {
 }
 ```
 
+## Installation
+
+Currently, the provider is not available via the terraform provider registry yet. While this is in progress (https://github.com/microsoft/terraform-provider-azuredevops/issues/241), the provider needs to be installed manually:
+
+1. Download the latest version https://github.com/microsoft/terraform-provider-azuredevops/releases
+2. Unpack the contents into the plugin directory `terraform.d/plugins/<your platform>/`
+3. Run `terraform init`
+
 ## Developer Requirements
 
 * [Terraform](https://www.terraform.io/downloads.html) version 0.12.x +
@@ -175,9 +183,9 @@ The following Environment Variables must be set in your shell prior to running a
 
 - `AZDO_ORG_SERVICE_URL`
 - `AZDO_PERSONAL_ACCESS_TOKEN`
-- `AZDO_DOCKERHUB_SERVICE_CONNECTION_EMAIL`
-- `AZDO_DOCKERHUB_SERVICE_CONNECTION_PASSWORD`
-- `AZDO_DOCKERHUB_SERVICE_CONNECTION_USERNAME`
+- `AZDO_DOCKERREGISTRY_SERVICE_CONNECTION_EMAIL`
+- `AZDO_DOCKERREGISTRY_SERVICE_CONNECTION_PASSWORD`
+- `AZDO_DOCKERREGISTRY_SERVICE_CONNECTION_USERNAME`
 - `AZDO_GITHUB_SERVICE_CONNECTION_PAT`
 - `AZDO_TEST_AAD_USER_EMAIL`
 
