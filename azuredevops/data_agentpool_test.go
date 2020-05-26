@@ -42,3 +42,29 @@ func TestDataSourceAgentPool_Read_TestAgentPoolNotFound(t *testing.T) {
 	err := dataSourceAgentPoolRead(resourceData, clients)
 	require.Contains(t, err.Error(), "Unable to find agent pool")
 }
+
+func TestDataSourceAgentPool_Read_TestMultipleAgentPoolsFound(t *testing.T) {
+	agentPoolListEmpty := []taskagent.TaskAgentPool{{}, {}}
+	name := "nonexistentAgentPool"
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	taskAgentClient := azdosdkmocks.NewMockTaskagentClient(ctrl)
+	clients := &config.AggregatedClient{
+		TaskAgentClient: taskAgentClient,
+		Ctx:             context.Background(),
+	}
+
+	taskAgentClient.
+		EXPECT().
+		GetAgentPools(clients.Ctx, taskagent.GetAgentPoolsArgs{
+			PoolName: &name,
+		}).
+		Return(&agentPoolListEmpty, nil).
+		Times(1)
+
+	resourceData := schema.TestResourceDataRaw(t, dataAzureAgentPool().Schema, nil)
+	resourceData.Set("name", &name)
+	err := dataSourceAgentPoolRead(resourceData, clients)
+	require.Contains(t, err.Error(), "Found multiple agent pools for name")
+}
