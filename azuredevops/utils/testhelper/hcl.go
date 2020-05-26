@@ -286,7 +286,7 @@ resource "azuredevops_agent_pool" "pool" {
 	}`, poolName)
 }
 
-// TestAccAgentPoolResource HCL describing an AzDO Agent Pool with agent pool name appended to resource name
+// TestAccAgentPoolResourceAppendPoolNameToResourceName HCL describing an AzDO Agent Pool with agent pool name appended to resource name
 func TestAccAgentPoolResourceAppendPoolNameToResourceName(poolName string) string {
 	return fmt.Sprintf(`
 resource "azuredevops_agent_pool" "pool_%[1]s" {
@@ -296,7 +296,7 @@ resource "azuredevops_agent_pool" "pool_%[1]s" {
 	}`, poolName)
 }
 
-// TestAccProjectDataSource HCL describing a data source for an AzDO Agent Pool
+// TestAccAgentPoolDataSource HCL describing a data source for an AzDO Agent Pool
 func TestAccAgentPoolDataSource() string {
 	return `
 data "azuredevops_agent_pool" "pool" {
@@ -304,7 +304,7 @@ data "azuredevops_agent_pool" "pool" {
 }`
 }
 
-// TestAccProjectDataSource HCL describing a data source for an AzDO Agent Pools
+// TestAccAgentPoolsDataSource HCL describing a data source for an AzDO Agent Pools
 func TestAccAgentPoolsDataSource() string {
 	return `
 data "azuredevops_agent_pools" "pools" {	
