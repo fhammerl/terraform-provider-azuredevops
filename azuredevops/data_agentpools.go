@@ -14,6 +14,18 @@ import (
 )
 
 func dataAzureAgentPools() *schema.Resource {
+	baseSchema := resourceAzureAgentPool()
+	baseSchema.Schema["id"] = &schema.Schema{
+		Type: schema.TypeInt,
+	}
+
+	for k, v := range baseSchema.Schema {
+		baseSchema.Schema[k] = &schema.Schema{
+			Type:     v.Type,
+			Computed: true,
+		}
+	}
+
 	return &schema.Resource{
 		Read: dataSourceAgentPoolsRead,
 
@@ -22,24 +34,7 @@ func dataAzureAgentPools() *schema.Resource {
 				Type:     schema.TypeList,
 				Computed: true,
 				Elem: &schema.Resource{
-					Schema: map[string]*schema.Schema{
-						"name": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"id": {
-							Type:     schema.TypeInt,
-							Computed: true,
-						},
-						"pool_type": {
-							Type:     schema.TypeString,
-							Computed: true,
-						},
-						"auto_provision": {
-							Type:     schema.TypeBool,
-							Computed: true,
-						},
-					},
+					Schema: baseSchema.Schema,
 				},
 			},
 		},
