@@ -8,7 +8,6 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/acctest"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/testhelper"
 )
 
@@ -38,38 +37,10 @@ func TestAccAgentPools_DataSource(t *testing.T) {
 			{
 				Config: agentPoolsData,
 				Check: resource.ComposeTestCheckFunc(
-					testAgentPoolExists(tfNode, agentPool1Name),
-					testAgentPoolExists(tfNode, agentPool2Name),
+					testhelper.TestPropertyValueExistsInTfNode(tfNode, "name", agentPool1Name),
+					testhelper.TestPropertyValueExistsInTfNode(tfNode, "name", agentPool2Name),
 				),
 			},
 		},
 	})
-}
-
-func testAgentPoolExists(tfNode string, poolName string) resource.TestCheckFunc {
-	return func(s *terraform.State) error {
-		rootModule := s.RootModule()
-		resource, ok := rootModule.Resources[tfNode]
-		if !ok {
-			return fmt.Errorf("Did not find a project in the TF state")
-		}
-
-		is := resource.Primary
-		if is == nil {
-			return fmt.Errorf("No primary instance: %s in %s", tfNode, rootModule.Path)
-		}
-		if !containsValue(is.Attributes, poolName) {
-			return fmt.Errorf("%s does not contain a pool with name %s", tfNode, poolName)
-		}
-		return nil
-	}
-}
-
-func containsValue(m map[string]string, v string) bool {
-	for _, x := range m {
-		if x == v {
-			return true
-		}
-	}
-	return false
 }
