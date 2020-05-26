@@ -2,12 +2,12 @@
 layout: "azuredevops"
 page_title: "AzureDevops: azuredevops_agent_pools"
 description: |-
-  Use this data source to access information about a existing Projects within Azure DevOps.
+  Use this data source to access information about a existing Agent Pools within Azure DevOps.
 ---
 
 # Data Source: azuredevops_agent_pools
 
-Use this data source to access information about existing Projects within Azure DevOps.
+Use this data source to access information about existing Agent Pools within Azure DevOps.
 
 ## Example Usage
 
@@ -43,4 +43,4 @@ The following attributes are exported:
 
 ## Relevant Links
 
-- [Azure DevOps Service REST API 5.1 - Projects - Get](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/pools/get?view=azure-devops-rest-5.1)
+- [Azure DevOps Service REST API 5.1 - Agent Pools - Get](https://docs.microsoft.com/en-us/rest/api/azure/devops/distributedtask/pools/get?view=azure-devops-rest-5.1)
