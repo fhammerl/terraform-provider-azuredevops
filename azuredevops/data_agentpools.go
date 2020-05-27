@@ -1,16 +1,13 @@
 package azuredevops
 
 import (
-	"crypto/sha1"
-	"encoding/base64"
 	"fmt"
 	"log"
-	"strings"
+	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/taskagent"
 	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/config"
-	"github.com/microsoft/terraform-provider-azuredevops/azuredevops/utils/datahelper"
 )
 
 func dataAzureAgentPools() *schema.Resource {
@@ -50,20 +47,12 @@ func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
 	}
 	log.Printf("[TRACE] plugin.terraform-provider-azuredevops: Read [%d] agent pools from current organization", len(*agentPools))
 
-	results, err := flattenAgentPoolReferences(agentPools)
+	results := flattenAgentPoolReferences(agentPools)
 	if err != nil {
 		return fmt.Errorf("Error flattening agentPools. Error: %v", err)
 	}
 
-	h := sha1.New()
-	agentPoolNames, err := datahelper.GetAttributeValues(results, "name")
-	if err != nil {
-		return fmt.Errorf("Failed to get list of agent pool names: %v", err)
-	}
-	if _, err := h.Write([]byte(strings.Join(agentPoolNames, "-"))); err != nil {
-		return fmt.Errorf("Unable to compute hash for agent pool names: %v", err)
-	}
-	d.SetId("agentPools#" + base64.URLEncoding.EncodeToString(h.Sum(nil)))
+	d.SetId(time.Now().UTC().String())
 	err = d.Set("agent_pools", results)
 	if err != nil {
 		return err
