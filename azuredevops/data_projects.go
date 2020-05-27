@@ -89,10 +89,7 @@ func dataSourceProjectsRead(d *schema.ResourceData, m interface{}) error {
 	}
 	log.Printf("[TRACE] plugin.terraform-provider-azuredevops: Read [%d] projects from current organization", len(projects))
 
-	results, err := flattenProjectReferences(&projects)
-	if err != nil {
-		return fmt.Errorf("Error flattening projects. Error: %v", err)
-	}
+	results := flattenProjectReferences(&projects)
 
 	projectNames, err := datahelper.GetAttributeValues(results, "name")
 	if err != nil {
@@ -113,9 +110,9 @@ func dataSourceProjectsRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func flattenProjectReferences(input *[]core.TeamProjectReference) ([]interface{}, error) {
+func flattenProjectReferences(input *[]core.TeamProjectReference) []interface{} {
 	if input == nil {
-		return []interface{}{}, nil
+		return []interface{}{}
 	}
 
 	results := make([]interface{}, 0)
@@ -141,7 +138,7 @@ func flattenProjectReferences(input *[]core.TeamProjectReference) ([]interface{}
 		results = append(results, output)
 	}
 
-	return results, nil
+	return results
 }
 
 func getProjectsForStateAndName(clients *config.AggregatedClient, projectState string, projectName string) ([]core.TeamProjectReference, error) {

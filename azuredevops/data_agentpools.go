@@ -71,9 +71,9 @@ func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func flattenAgentPoolReferences(input *[]taskagent.TaskAgentPool) ([]interface{}, error) {
+func flattenAgentPoolReferences(input *[]taskagent.TaskAgentPool) []interface{} {
 	if input == nil {
-		return []interface{}{}, nil
+		return []interface{}{}
 	}
 
 	results := make([]interface{}, 0)
@@ -99,7 +99,7 @@ func flattenAgentPoolReferences(input *[]taskagent.TaskAgentPool) ([]interface{}
 		results = append(results, output)
 	}
 
-	return results, nil
+	return results
 }
 
 func getAgentPools(clients *config.AggregatedClient) (*[]taskagent.TaskAgentPool, error) {
