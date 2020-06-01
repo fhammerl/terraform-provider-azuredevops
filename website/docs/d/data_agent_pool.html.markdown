@@ -13,7 +13,7 @@ Use this data source to access information about an existing Agent Pool within A
 
 ```hcl
 data "azuredevops_agent_pool" "pool" {
-	name = "Sample Agent Pool"
+  name = "Sample Agent Pool"
 }
 
 output "name" {
