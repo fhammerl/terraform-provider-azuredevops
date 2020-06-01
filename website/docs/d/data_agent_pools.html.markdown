@@ -2,7 +2,7 @@
 layout: "azuredevops"
 page_title: "AzureDevops: azuredevops_agent_pools"
 description: |-
-  Use this data source to access information about a existing Agent Pools within Azure DevOps.
+  Use this data source to access information about existing Agent Pools within Azure DevOps.
 ---
 
 # Data Source: azuredevops_agent_pools
