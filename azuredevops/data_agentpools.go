@@ -12,8 +12,12 @@ import (
 
 func dataAzureAgentPools() *schema.Resource {
 	baseSchema := resourceAzureAgentPool()
+
+	// Now that the base schema's ID is not being used as the resource's ID, we can correctly
+	// set it to be an integer.
 	baseSchema.Schema["id"] = &schema.Schema{
-		Type: schema.TypeInt,
+		Type:     schema.TypeInt,
+		Computed: true,
 	}
 
 	for k, v := range baseSchema.Schema {
@@ -47,16 +51,12 @@ func dataSourceAgentPoolsRead(d *schema.ResourceData, m interface{}) error {
 	}
 	log.Printf("[TRACE] plugin.terraform-provider-azuredevops: Read [%d] agent pools from current organization", len(*agentPools))
 
-	results := flattenAgentPoolReferences(agentPools)
+	err = d.Set("agent_pools", flattenAgentPoolReferences(agentPools))
 	if err != nil {
-		return fmt.Errorf("Error flattening agentPools. Error: %v", err)
+		return fmt.Errorf("Error setting agent_pools field in state. Error: %v", err)
 	}
 
 	d.SetId(time.Now().UTC().String())
-	err = d.Set("agent_pools", results)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 

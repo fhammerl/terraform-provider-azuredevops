@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestDataSourceAgentPool_Read_TestEmptyAgentPoolList(t *testing.T) {
+func TestDataSourceAgentPools_Read_TestEmptyAgentPoolList(t *testing.T) {
 	agentPoolListEmpty := []taskagent.TaskAgentPool{}
 
 	ctrl := gomock.NewController(t)
@@ -65,7 +65,7 @@ var dataTestAgentPools = []taskagent.TaskAgentPool{
 	},
 }
 
-func TestDataSourceAgentPool_Read_TestFindAllAgentPools(t *testing.T) {
+func TestDataSourceAgentPools_Read_TestFindAllAgentPools(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	taskAgentClient := azdosdkmocks.NewMockTaskagentClient(ctrl)

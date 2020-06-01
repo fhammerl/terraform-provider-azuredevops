@@ -8,8 +8,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/terraform"
 )
 
-// TestPropertyValueExistsInTfNode checks if a property exists with a certain value in an instance state
-func TestPropertyValueExistsInTfNode(tfNode string, propertyName string, propertyValue string) resource.TestCheckFunc {
+// CheckNestedKeyExistsWithValue checks if a property exists with a certain value in an instance state
+func CheckNestedKeyExistsWithValue(tfNode string, propertyName string, propertyValue string) resource.TestCheckFunc {
 	return func(s *terraform.State) error {
 		rootModule := s.RootModule()
 		resource, ok := rootModule.Resources[tfNode]

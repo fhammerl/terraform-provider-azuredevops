@@ -37,8 +37,8 @@ func TestAccAgentPools_DataSource(t *testing.T) {
 			{
 				Config: agentPoolsData,
 				Check: resource.ComposeTestCheckFunc(
-					testhelper.TestPropertyValueExistsInTfNode(tfNode, "name", agentPool1Name),
-					testhelper.TestPropertyValueExistsInTfNode(tfNode, "name", agentPool2Name),
+					testhelper.CheckNestedKeyExistsWithValue(tfNode, "name", agentPool1Name),
+					testhelper.CheckNestedKeyExistsWithValue(tfNode, "name", agentPool2Name),
 				),
 			},
 		},
